@@ -23,6 +23,8 @@ public class GameOverUI : MonoBehaviour
         {
             resumeButton.onClick.AddListener(() =>
             {
+                SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
                 GameManager.Instance.SetGameState(GameManager.GameState.Gameplaying);
                 Hide();
             });
@@ -30,16 +32,22 @@ public class GameOverUI : MonoBehaviour
 
         if (restartButton != null)
         {
+
             restartButton.onClick.AddListener(() =>
             {
+                SoundManager.Instance.PlayButtonClick(Vector3.zero);
+                GameManager.Instance.SetGameState(GameManager.GameState.Gameplaying);
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             });
         }
 
         if (quitButton != null)
         {
+
             quitButton.onClick.AddListener(() =>
             {
+                SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
                 if (!string.IsNullOrEmpty(menuSceneName))
                     SceneManager.LoadScene(menuSceneName);
                 else

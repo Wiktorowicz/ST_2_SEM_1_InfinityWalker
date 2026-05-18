@@ -37,11 +37,16 @@ public class MenuManager : MonoBehaviour
 
     void Play()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         SceneManager.LoadScene(playScene);
     }
 
     void OpenSettings()
     {
+
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         // jeśli już otwarty → zamknij
         if (settingsPanel.activeSelf)
         {
@@ -56,6 +61,9 @@ public class MenuManager : MonoBehaviour
 
     void OpenAbout()
     {
+
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         if (aboutPanel.activeSelf)
         {
             aboutPanel.SetActive(false);
@@ -68,6 +76,7 @@ public class MenuManager : MonoBehaviour
 
     public void ClosePanels()
     {
+
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
 
@@ -77,6 +86,9 @@ public class MenuManager : MonoBehaviour
 
     void Quit()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
+
         Application.Quit();
     }
 }

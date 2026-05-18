@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PauseManager : MonoBehaviour
 {
@@ -17,12 +18,27 @@ public class PauseManager : MonoBehaviour
     [SerializeField] private string gameSceneName;
     [SerializeField] private string menuSceneName;
 
+    [Header("Audio")]
+    [SerializeField] private Slider soundEffectsSlider;
+    [SerializeField] private TextMeshProUGUI soundEffectsText;
+
     private bool isPaused = false;
 
     private void Start()
     {
         Time.timeScale = 1f;
         isPaused = false;
+
+
+        soundEffectsSlider.value = SoundManager.Instance.GetVolume() * 100f;
+
+        soundEffectsSlider.onValueChanged.AddListener((float value) => {
+            SoundManager.Instance.SetVolume(Mathf.RoundToInt(value));
+            UpdateVisual();
+        });
+
+        UpdateVisual();
+
 
         if (pausePanel != null)
             pausePanel.SetActive(false);
@@ -55,6 +71,8 @@ public class PauseManager : MonoBehaviour
 
     private void Pause()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         Time.timeScale = 0f;
         isPaused = true;
 
@@ -64,6 +82,8 @@ public class PauseManager : MonoBehaviour
 
     private void Resume()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         Time.timeScale = 1f;
         isPaused = false;
 
@@ -73,13 +93,29 @@ public class PauseManager : MonoBehaviour
 
     private void Restart()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         Time.timeScale = 1f;
         SceneManager.LoadScene(gameSceneName);
     }
 
     private void QuitToMenu()
     {
+        SoundManager.Instance.PlayButtonClick(Vector3.zero);
+
         Time.timeScale = 1f;
         SceneManager.LoadScene(menuSceneName);
+    }
+
+
+    private void UpdateVisual() {
+        int volume = Mathf.RoundToInt(soundEffectsSlider.value);
+
+        if (volume == 0) {
+            soundEffectsText.text = "SFX Volume: OFF";
+        }
+        else {
+            soundEffectsText.text = "SFX Volume: " + volume + "%";
+        }
     }
 }
