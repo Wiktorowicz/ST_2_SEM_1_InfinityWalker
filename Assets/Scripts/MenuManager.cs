@@ -31,7 +31,6 @@ public class MenuManager : MonoBehaviour
         if (quitButton != null)
             quitButton.onClick.AddListener(Quit);
 
-        // Na start wyłącz wszystko (pewność że nic się nie nałoży)
         ClosePanels();
     }
 
@@ -47,14 +46,12 @@ public class MenuManager : MonoBehaviour
 
         SoundManager.Instance.PlayButtonClick(Vector3.zero);
 
-        // jeśli już otwarty → zamknij
         if (settingsPanel.activeSelf)
         {
             settingsPanel.SetActive(false);
             return;
         }
 
-        // w innym przypadku → zamknij inne i otwórz ten
         ClosePanels();
         settingsPanel.SetActive(true);
     }
