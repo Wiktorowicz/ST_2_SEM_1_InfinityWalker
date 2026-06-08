@@ -1,63 +1,140 @@
 using UnityEngine;
 
-public class ObstacleSpawner : MonoBehaviour {
-    [SerializeField] private GameObject obstaclePrefab;
+public class ObstacleSpawner : MonoBehaviour
+{
+    private enum ObstacleType
+    {
+        Empty,
+        FullWall,
+        JumpWall,
+        SlideWall
+    }
 
-    [SerializeField] private float worldSpeed = 10f;
-    [SerializeField] private float firstSpawnZ = 20f;
+    [Header("Obstacle Prefabs")]
+    [SerializeField] private GameObject fullWallPrefab;
+    [SerializeField] private GameObject jumpWallPrefab;
+    [SerializeField] private GameObject slideWallPrefab;
+
+    [Header("Spawning")]
     [SerializeField] private float distanceBetweenRows = 12f;
-    [SerializeField] private int rowsAhead = 10;
 
     [SerializeField] private float[] lanePositions = { -3f, 0f, 3f };
 
-    private readonly bool[][] obstaclePatterns = {
-        new[] { true, false, false },
-        new[] { false, true, false },
-        new[] { false, false, true },
+    [Header("Obstacle Heights")]
+    [SerializeField] private float groundObstacleY = 0.5f;
+    [SerializeField] private float slideObstacleY = 1f;
 
-        new[] { true, true, false },
-        new[] { true, false, true },
-        new[] { false, true, true }
-    };
+    [Header("Rare Empty Lane")]
+    [SerializeField] private float emptyLaneChance = 0.03f;
 
-    private float nextSpawnZ;
     private float simulatedPlayerZ;
+    private float nextSpawnDistance;
 
-    private void Start() {
-        nextSpawnZ = firstSpawnZ;
+    private void Start()
+    {
+        nextSpawnDistance = distanceBetweenRows;
+    }
 
-        for (int i = 0; i < rowsAhead; i++) {
+    private void Update()
+    {
+        simulatedPlayerZ += GameManager.Instance.WorldSpeed * Time.deltaTime;
+
+        if (simulatedPlayerZ >= nextSpawnDistance)
+        {
             SpawnObstacleRow();
+            nextSpawnDistance += distanceBetweenRows;
         }
     }
 
-    private void Update() {
-        simulatedPlayerZ += worldSpeed * Time.deltaTime;
+    private void SpawnObstacleRow()
+    {
+        ObstacleType[] row = new ObstacleType[lanePositions.Length];
 
-        while (nextSpawnZ < simulatedPlayerZ + rowsAhead * distanceBetweenRows) {
-            SpawnObstacleRow();
-        }
-    }
+        bool hasActionObstacle = false;
 
-    private void SpawnObstacleRow() {
-        bool[] selectedPattern = obstaclePatterns[
-            Random.Range(0, obstaclePatterns.Length)
-        ];
+        for (int i = 0; i < row.Length; i++)
+        {
+            row[i] = GetRandomObstacleType();
 
-        for (int laneIndex = 0; laneIndex < lanePositions.Length; laneIndex++) {
-            if (!selectedPattern[laneIndex]) {
-                continue;
+            if (row[i] == ObstacleType.JumpWall || row[i] == ObstacleType.SlideWall)
+            {
+                hasActionObstacle = true;
             }
+        }
+
+        if (!hasActionObstacle)
+        {
+            int randomLane = Random.Range(0, row.Length);
+
+            row[randomLane] = Random.value < 0.5f
+                ? ObstacleType.JumpWall
+                : ObstacleType.SlideWall;
+        }
+
+        if (Random.value < emptyLaneChance)
+        {
+            int emptyLane = Random.Range(0, row.Length);
+            row[emptyLane] = ObstacleType.Empty;
+        }
+
+        for (int laneIndex = 0; laneIndex < lanePositions.Length; laneIndex++)
+        {
+            ObstacleType obstacleType = row[laneIndex];
+
+            if (obstacleType == ObstacleType.Empty)
+                continue;
+
+            GameObject selectedPrefab = GetPrefabByType(obstacleType);
+
+            float obstacleY = obstacleType == ObstacleType.SlideWall
+                ? slideObstacleY
+                : groundObstacleY;
 
             Vector3 obstaclePosition = new Vector3(
-                lanePositions[laneIndex],
-                0.5f,
-                nextSpawnZ
+                transform.position.x + lanePositions[laneIndex],
+                transform.position.y + obstacleY,
+                transform.position.z
             );
 
-            Instantiate(obstaclePrefab, obstaclePosition, Quaternion.identity);
+            Instantiate(selectedPrefab, obstaclePosition, Quaternion.identity);
         }
+    }
 
-        nextSpawnZ += distanceBetweenRows;
+    private ObstacleType GetRandomObstacleType()
+    {
+        int randomType = Random.Range(0, 3);
+
+        switch (randomType)
+        {
+            case 0:
+                return ObstacleType.FullWall;
+
+            case 1:
+                return ObstacleType.JumpWall;
+
+            case 2:
+                return ObstacleType.SlideWall;
+
+            default:
+                return ObstacleType.JumpWall;
+        }
+    }
+
+    private GameObject GetPrefabByType(ObstacleType obstacleType)
+    {
+        switch (obstacleType)
+        {
+            case ObstacleType.FullWall:
+                return fullWallPrefab;
+
+            case ObstacleType.JumpWall:
+                return jumpWallPrefab;
+
+            case ObstacleType.SlideWall:
+                return slideWallPrefab;
+
+            default:
+                return jumpWallPrefab;
+        }
     }
 }

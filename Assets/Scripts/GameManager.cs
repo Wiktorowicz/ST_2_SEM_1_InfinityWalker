@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public int CurrentScore => Mathf.FloorToInt(currentScore);
     public int BestScore => PlayerPrefs.GetInt("BestScore", 0);
     public float CurrentScoreMultiplier => currentScoreMultiplier;
+    public float WorldSpeed => worldSpeed;
 
     [Header("Game State")]
     [SerializeField] private GameState startingGameState = GameState.Gameplaying;
@@ -30,10 +31,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float multiplierIncreasePerSecond = 0.05f;
     [SerializeField] private float maxMultiplier = 10f;
 
+    [Header("World Speed")]
+    [SerializeField] private float startWorldSpeed = 10f;
+    [SerializeField] private float speedIncreasePerScore = 0.03f;
+    [SerializeField] private float maxWorldSpeed = 30f;
+
     private GameState currentGameState;
 
     private float currentScore;
     private float currentScoreMultiplier = 1f;
+    private float worldSpeed;
 
     private void Awake()
     {
@@ -48,6 +55,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        worldSpeed = startWorldSpeed;
         SetGameState(startingGameState);
     }
 
@@ -66,6 +74,11 @@ public class GameManager : MonoBehaviour
 
         currentScore += baseScorePerSecond * currentScoreMultiplier * Time.deltaTime;
 
+        worldSpeed = Mathf.Min(
+            startWorldSpeed + CurrentScore * speedIncreasePerScore,
+            maxWorldSpeed
+        );
+
         OnScoreChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -73,6 +86,8 @@ public class GameManager : MonoBehaviour
     {
         currentScore = 0f;
         currentScoreMultiplier = 1f;
+        worldSpeed = startWorldSpeed;
+
         OnScoreChanged?.Invoke(this, EventArgs.Empty);
     }
 
