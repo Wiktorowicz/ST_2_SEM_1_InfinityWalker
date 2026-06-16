@@ -37,6 +37,7 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void Update()
     {
+
         simulatedPlayerZ += GameManager.Instance.WorldSpeed * Time.deltaTime;
 
         if (simulatedPlayerZ >= nextSpawnDistance)

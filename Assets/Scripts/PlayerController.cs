@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private bool isSliding;
 
+    public bool IsGrounded => isGrounded;
+
     private float normalHeight;
     private Vector3 normalCenter;
     private float startZ;
@@ -54,9 +56,9 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(moveX, 0, 0);
         controller.Move(move * moveSpeed * Time.deltaTime);
 
-        bool jumpPressed = Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.wKey.isPressed;
+        bool jumpPressed = Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame;
         bool slideHeld = Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.sKey.isPressed;
-        bool slidePressed = Keyboard.current.leftCtrlKey.wasPressedThisFrame || Keyboard.current.sKey.isPressed;
+        bool slidePressed = Keyboard.current.leftCtrlKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame;
 
         if (isGrounded)
             animator.SetBool("IsJumping", false);

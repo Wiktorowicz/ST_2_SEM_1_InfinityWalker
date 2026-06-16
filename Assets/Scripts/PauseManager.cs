@@ -53,10 +53,11 @@ public class PauseManager : MonoBehaviour
             quitButton.onClick.AddListener(QuitToMenu);
     }
 
-    private void Update()
-    {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
+    private void Update() {
+        if (GameManager.Instance.CurrentGameState != GameManager.GameState.Gameplaying)
+            return;
+
+        if (Keyboard.current.escapeKey.wasPressedThisFrame) {
             TogglePause();
         }
     }
