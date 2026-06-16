@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Animations;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public float fastFallForce = -25f;
 
     private CharacterController controller;
+    private Animator animator;
     private Vector3 velocity;
     private bool isGrounded;
     private bool isSliding;
@@ -25,6 +27,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>();
 
         normalHeight = controller.height;
         normalCenter = controller.center;
@@ -35,8 +38,10 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = controller.isGrounded;
 
+
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
+
 
         float moveX = 0f;
 
@@ -49,12 +54,17 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(moveX, 0, 0);
         controller.Move(move * moveSpeed * Time.deltaTime);
 
-        bool jumpPressed = Keyboard.current.spaceKey.wasPressedThisFrame;
-        bool slideHeld = Keyboard.current.leftCtrlKey.isPressed;
-        bool slidePressed = Keyboard.current.leftCtrlKey.wasPressedThisFrame;
+        bool jumpPressed = Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.wKey.isPressed;
+        bool slideHeld = Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.sKey.isPressed;
+        bool slidePressed = Keyboard.current.leftCtrlKey.wasPressedThisFrame || Keyboard.current.sKey.isPressed;
+
+        if (isGrounded)
+            animator.SetBool("IsJumping", false);
+
 
         if (jumpPressed)
         {
+            animator.SetBool("IsJumping", true);
             if (isSliding)
                 StopSlide();
 
