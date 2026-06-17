@@ -1163,7 +1163,7 @@ MonoBehaviour:
   moveSpeed: 10
   jumpForce: 20
   gravity: -70
-  slideHeightMultiplier: 0.5
+  slideHeightMultiplier: 0.15
   fastFallForce: -25
 --- !u!143 &548976387
 CharacterController:
@@ -5199,8 +5199,9 @@ MonoBehaviour:
   - -3
   - 0
   - 3
-  groundObstacleY: 0.5
-  slideObstacleY: 2.75
+  fullWallY: 0.5
+  jumpWallY: 0.5
+  slideWallY: 3.2
   emptyLaneChance: 0.03
 --- !u!4 &2049651290
 Transform:

@@ -310,8 +310,8 @@ Transform:
   m_GameObject: {fileID: 7766006594238876773}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 2.5, z: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 3, y: 1.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2796117665443620247}
@@ -408,7 +408,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c2c56edfc4e3ec43a19a2a301b7a503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldMover
-  speed: 10
 --- !u!54 &800210400477792560
 Rigidbody:
   m_ObjectHideFlags: 0

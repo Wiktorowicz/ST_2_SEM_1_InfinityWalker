@@ -17,12 +17,12 @@ public class ObstacleSpawner : MonoBehaviour
 
     [Header("Spawning")]
     [SerializeField] private float distanceBetweenRows = 12f;
-
     [SerializeField] private float[] lanePositions = { -3f, 0f, 3f };
 
     [Header("Obstacle Heights")]
-    [SerializeField] private float groundObstacleY = 0.5f;
-    [SerializeField] private float slideObstacleY = 1f;
+    [SerializeField] private float fullWallY = 0.5f;
+    [SerializeField] private float jumpWallY = 0.5f;
+    [SerializeField] private float slideWallY = 1.0f;
 
     [Header("Rare Empty Lane")]
     [SerializeField] private float emptyLaneChance = 0.03f;
@@ -37,7 +37,6 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void Update()
     {
-
         simulatedPlayerZ += GameManager.Instance.WorldSpeed * Time.deltaTime;
 
         if (simulatedPlayerZ >= nextSpawnDistance)
@@ -50,7 +49,6 @@ public class ObstacleSpawner : MonoBehaviour
     private void SpawnObstacleRow()
     {
         ObstacleType[] row = new ObstacleType[lanePositions.Length];
-
         bool hasActionObstacle = false;
 
         for (int i = 0; i < row.Length; i++)
@@ -58,9 +56,7 @@ public class ObstacleSpawner : MonoBehaviour
             row[i] = GetRandomObstacleType();
 
             if (row[i] == ObstacleType.JumpWall || row[i] == ObstacleType.SlideWall)
-            {
                 hasActionObstacle = true;
-            }
         }
 
         if (!hasActionObstacle)
@@ -86,14 +82,11 @@ public class ObstacleSpawner : MonoBehaviour
                 continue;
 
             GameObject selectedPrefab = GetPrefabByType(obstacleType);
-
-            float obstacleY = obstacleType == ObstacleType.SlideWall
-                ? slideObstacleY
-                : groundObstacleY;
+            float selectedY = GetYByType(obstacleType);
 
             Vector3 obstaclePosition = new Vector3(
                 transform.position.x + lanePositions[laneIndex],
-                transform.position.y + obstacleY,
+                transform.position.y + selectedY,
                 transform.position.z
             );
 
@@ -109,13 +102,10 @@ public class ObstacleSpawner : MonoBehaviour
         {
             case 0:
                 return ObstacleType.FullWall;
-
             case 1:
                 return ObstacleType.JumpWall;
-
             case 2:
                 return ObstacleType.SlideWall;
-
             default:
                 return ObstacleType.JumpWall;
         }
@@ -127,15 +117,27 @@ public class ObstacleSpawner : MonoBehaviour
         {
             case ObstacleType.FullWall:
                 return fullWallPrefab;
-
             case ObstacleType.JumpWall:
                 return jumpWallPrefab;
-
             case ObstacleType.SlideWall:
                 return slideWallPrefab;
-
             default:
                 return jumpWallPrefab;
+        }
+    }
+
+    private float GetYByType(ObstacleType obstacleType)
+    {
+        switch (obstacleType)
+        {
+            case ObstacleType.FullWall:
+                return fullWallY;
+            case ObstacleType.JumpWall:
+                return jumpWallY;
+            case ObstacleType.SlideWall:
+                return slideWallY;
+            default:
+                return 0f;
         }
     }
 }

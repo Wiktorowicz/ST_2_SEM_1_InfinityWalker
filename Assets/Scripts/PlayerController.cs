@@ -1,5 +1,4 @@
-﻿using UnityEditor.Animations;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -9,30 +8,41 @@ public class PlayerController : MonoBehaviour
     public float gravity = -20f;
 
     [Header("Slide")]
-    public float slideHeightMultiplier = 0.5f;
+    public float slideHeightMultiplier = 0.3f;
 
     [Header("Fast Fall")]
     public float fastFallForce = -25f;
 
     private CharacterController controller;
+    private CapsuleCollider capsule;
     private Animator animator;
+
     private Vector3 velocity;
     private bool isGrounded;
     private bool isSliding;
 
     public bool IsGrounded => isGrounded;
 
-    private float normalHeight;
-    private Vector3 normalCenter;
+    private float normalControllerHeight;
+    private Vector3 normalControllerCenter;
+
+    private float normalCapsuleHeight;
+    private Vector3 normalCapsuleCenter;
+
     private float startZ;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        capsule = GetComponent<CapsuleCollider>();
         animator = GetComponentInChildren<Animator>();
 
-        normalHeight = controller.height;
-        normalCenter = controller.center;
+        normalControllerHeight = controller.height;
+        normalControllerCenter = controller.center;
+
+        normalCapsuleHeight = capsule.height;
+        normalCapsuleCenter = capsule.center;
+
         startZ = transform.position.z;
     }
 
@@ -40,10 +50,8 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = controller.isGrounded;
 
-
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
-
 
         float moveX = 0f;
 
@@ -63,10 +71,10 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
             animator.SetBool("IsJumping", false);
 
-
         if (jumpPressed)
         {
             animator.SetBool("IsJumping", true);
+
             if (isSliding)
                 StopSlide();
 
@@ -106,17 +114,23 @@ public class PlayerController : MonoBehaviour
             return;
 
         isSliding = true;
+        animator.SetBool("IsSliding", true);
 
-        float slideHeight = normalHeight * slideHeightMultiplier;
-
-        controller.height = slideHeight;
+        float controllerSlideHeight = normalControllerHeight * slideHeightMultiplier;
+        controller.height = controllerSlideHeight;
         controller.center = new Vector3(
-            normalCenter.x,
-            normalCenter.y - (normalHeight - slideHeight) / 2f,
-            normalCenter.z
+            normalControllerCenter.x,
+            normalControllerCenter.y - (normalControllerHeight - controllerSlideHeight) / 2f,
+            normalControllerCenter.z
         );
 
-        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        float capsuleSlideHeight = normalCapsuleHeight * slideHeightMultiplier;
+        capsule.height = capsuleSlideHeight;
+        capsule.center = new Vector3(
+            normalCapsuleCenter.x,
+            normalCapsuleCenter.y - (normalCapsuleHeight - capsuleSlideHeight) / 2f,
+            normalCapsuleCenter.z
+        );
     }
 
     private void StopSlide()
@@ -125,16 +139,12 @@ public class PlayerController : MonoBehaviour
             return;
 
         isSliding = false;
+        animator.SetBool("IsSliding", false);
 
-        transform.rotation = Quaternion.identity;
+        controller.height = normalControllerHeight;
+        controller.center = normalControllerCenter;
 
-        transform.position = new Vector3(
-            transform.position.x,
-            transform.position.y,
-            startZ
-        );
-
-        controller.height = normalHeight;
-        controller.center = normalCenter;
+        capsule.height = normalCapsuleHeight;
+        capsule.center = normalCapsuleCenter;
     }
 }

@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Rotator : MonoBehaviour {
-    public float turnAngle = 20f; // obrót w lewo/prawo
-    public float tiltAngle = 15f; // przechylenie
+    public float turnAngle = 20f;
+    public float tiltAngle = 15f;
     public float smoothSpeed = 10f;
 
     void Update() {
@@ -18,9 +18,9 @@ public class Rotator : MonoBehaviour {
         }
 
         Quaternion targetRotation = Quaternion.Euler(
-            0f,                          // X
-            horizontal * turnAngle,      // Y - skrêt
-            -horizontal * tiltAngle      // Z - przechylenie
+            0f,
+            horizontal * turnAngle,
+            -horizontal * tiltAngle
         );
 
         transform.localRotation = Quaternion.Lerp(
